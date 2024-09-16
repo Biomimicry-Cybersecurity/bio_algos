@@ -1,0 +1,266 @@
+---
+title: "ACO"
+author: "Dmitry Gavrilkoff"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Ant Colony Optimization (ACO)
+Ant Colony Optimization (ACO) is a population-based metaheuristic algorithm inspired by the foraging behavior of ants. It was introduced by Marco Dorigo in the early 1990s as a method for solving combinatorial optimization problems. ACO is well-suited for problems where the goal is to find optimal paths or solutions by simulating the way ants communicate via pheromones to find the shortest paths between their colony and food sources.
+
+## Biological Inspiration
+Ants, when searching for food, initially move randomly. As they explore, they deposit a chemical substance called pheromone on the paths they travel. When other ants encounter these pheromones, they are more likely to follow the paths with higher pheromone concentrations. Over time, shorter paths accumulate more pheromones because they are traversed more frequently, while longer paths' pheromone trails evaporate. This collective behavior eventually leads the ants to converge on the shortest path.
+
+## ACO Algorithm Framework
+The ACO algorithm simulates this natural behavior in computational optimization problems. The primary idea is to have a group of artificial ants iteratively construct solutions to a problem, influenced by pheromone trails and problem-specific heuristics. The quality of solutions improves as better solutions lay down more pheromones, which guide the search process.
+
+## Steps of the ACO Algorithm:
+1. __Initialization__:
+initialize pheromone trails on all paths between nodes in the search space.
+Set algorithm parameters such as pheromone evaporation rate, number of ants, etc.
+
+2. __Solution Construction__:
+each ant starts from a random node (or a designated start point) and constructs a solution step-by-step, selecting the next node based on two factors:
+  * Pheromone level: Paths with higher pheromone concentration are more attractive.
+  * Heuristic information: Domain-specific information about the problem that guides ants to choose paths (e.g., distance between nodes).
+The probability of selecting the next node is determined by a combination of pheromone intensity and heuristic information (e.g., inverse distance for TSP).
+
+3. __Pheromone Update__:
+after all ants have constructed solutions, the pheromone levels on the paths are updated. Two processes take place:
+Pheromone Evaporation: Pheromones decay over time to avoid premature convergence to suboptimal solutions.
+Pheromone Deposition: Ants deposit pheromones on the paths they traveled, with better solutions (shorter paths or lower-cost solutions) receiving more pheromone.
+
+4. __Iteration and Convergence__:
+this process is repeated for a fixed number of iterations or until convergence criteria are met (e.g., no improvement in the solution over several iterations).
+The best solution found is reported as the final result.
+
+## Algorithm Hyperparameters:
+  * Number of ants per iteration.
+  * Number of iterations the algorithm runs.
+  * The relative importance of pheromone (guides ants towards previously good solutions).
+  * The relative importance of heuristic information (helps ants make decisions based on the problem's structure, like distance in TSP).
+  * Evaporation rate. Higher values lead to faster decay of pheromones, promoting exploration and preventing premature convergence.
+  * Pheromone deposit constant. Affects how much pheromone is deposited by each ant on its path.
+
+Tuning these parameters is critical for the algorithm's performance, and they are typically problem-dependent.
+
+## Where ACO is Applied
+ACO is widely used to solve combinatorial optimization problems where finding the optimal sequence or path is critical. Below are some common applications:
+
+1. __Traveling Salesman Problem (TSP)__:
+ACO was initially designed to solve the TSP, where the objective is to find the shortest possible route that visits a set of cities exactly once and returns to the starting point.
+The ACO algorithm efficiently balances exploration and exploitation through pheromone trails, guiding the ants to the shortest route over iterations.
+2. __Vehicle Routing Problem (VRP)__:
+Similar to the TSP but with additional constraints such as vehicle capacity and customer demand.
+ACO helps optimize the routes of multiple vehicles to minimize total distance while satisfying all delivery requirements.
+3. __Network Routing__:
+ACO has been successfully applied to network routing, particularly in dynamic and distributed networks like telecommunication networks or computer networks.
+In this context, ants explore paths to find the shortest or least congested routes between nodes, adapting to real-time changes in the network (e.g., packet switching in networks).
+4. __Scheduling Problems__:
+ACO is used in job-shop and flow-shop scheduling problems, where the objective is to assign tasks to resources (like machines) in a way that minimizes makespan, completion time, or other objectives.
+It efficiently handles constraints like deadlines, processing times, and resource availability.
+5. __Assignment Problems__:
+ACO has been applied to assignment problems such as the quadratic assignment problem (QAP), where the objective is to minimize the cost of assigning a set of tasks or agents to locations or resources.
+6. __Knapsack Problem__:
+In this problem, the goal is to maximize the value of items packed into a knapsack with a fixed weight capacity.
+ACO can explore combinations of items efficiently and find near-optimal solutions.
+7. __Protein Folding__:
+ACO has been used to model protein folding by treating the possible configurations of amino acids as the search space and optimizing for the structure with the lowest free energy.
+
+## Strengths and Challenges of ACO
+### Strengths:
+* __Distributed search__: Multiple ants explore the search space simultaneously, which allows the algorithm to gather information from diverse regions and helps in escaping local minima.
+* __Adaptivity__: ACO can adapt to dynamic changes in the problem environment (e.g., dynamic network routing).
+* __Positive feedback__: Good solutions are reinforced through pheromone deposition, leading to convergence towards optimal or near-optimal solutions.
+
+### Challenges:
+* __Computational cost__: Since each ant constructs a solution independently, the computational cost grows with the number of ants and the size of the problem.
+* __Premature convergence__: ACO can sometimes converge too quickly to suboptimal solutions if pheromone evaporation is not properly tuned.
+* __Hyperparameter tuning__: The performance of ACO is highly sensitive to its parameters (alpha, beta, rho, etc.), requiring careful tuning, often through trial and error or automated methods like grid search.
+
+## R Implementation of ACO for Ackley Function
+```{r}
+# Required libraries for visualization
+library(ggplot2)
+library(reshape2)
+library(plotly)
+```
+
+# Objective function
+```{r}
+# Ackley function definition
+ackley_function <- function(x, y) {
+  term1 <- -20 * exp(-0.2 * sqrt(0.5 * (x^2 + y^2)))
+  term2 <- -exp(0.5 * (cos(2 * pi * x) + cos(2 * pi * y)))
+  result <- term1 + term2 + 20 + exp(1)
+  return(result)
+}
+```
+
+# 3D plot
+```{r}
+# Generate grid for plotting the Ackley function
+n_points <- 100
+x_vals <- seq(-32.768, 32.768, length.out = n_points)
+y_vals <- seq(-32.768, 32.768, length.out = n_points)
+
+# Compute Ackley function values on the grid
+ackley_matrix <- outer(x_vals, y_vals, ackley_function)
+
+# Convert the Ackley function data into a data frame for plotting
+ackley_df <- expand.grid(x = x_vals, y = y_vals)
+ackley_df$z <- as.vector(ackley_matrix)
+
+# Best solution found (for example, from the ACO algorithm)
+best_solution_x <- 0.0  # Replace this with the actual x-coordinate of the best solution
+best_solution_y <- 0.0  # Replace this with the actual y-coordinate of the best solution
+best_solution_value <- ackley_function(best_solution_x, best_solution_y)
+
+# 1. 3D Surface Plot of the Ackley Function
+plot_3d <- plot_ly(x = ~x_vals, y = ~y_vals, z = ~ackley_matrix) %>%
+  add_surface() %>%
+  layout(title = "3D Surface Plot of Ackley Function",
+         scene = list(xaxis = list(title = "X"),
+                      yaxis = list(title = "Y"),
+                      zaxis = list(title = "Ackley Value")))
+
+plot_3d
+
+```
+
+# Hyperparameters
+```{r}
+# ACO Parameters
+n_ants <- 8                 # Number of ants
+n_iterations <- 10          # Number of iterations
+alpha <- 1                  # Importance of pheromone
+beta <- 2                   # Importance of heuristic (1/distance)
+evaporation_rate <- 0.5     # Pheromone evaporation rate
+pheromone_initial <- 1.0    # Initial pheromone level
+pheromone_matrix <- matrix(pheromone_initial, nrow = 2, ncol = 2) # 2D problem
+bounds <- c(-32.768, 32.768) # Search space bounds for x and y
+decay <- 0.1                # Evaporation decay of pheromone
+Q <- 100                    # Pheromone deposit factor
+
+# Number of discretized steps for x and y
+n_steps <- 100
+# Limit the number of steps each ant can take
+ant_steps <- 9
+
+```
+
+
+# Setting Grids
+```{r}
+x_vals <- seq(bounds[1], bounds[2], length.out = n_steps)
+y_vals <- seq(bounds[1], bounds[2], length.out = n_steps)
+
+# Pheromone matrix to guide the search
+pheromone_matrix <- matrix(pheromone_initial, nrow = n_steps, ncol = n_steps)
+
+# Visibility matrix (inverse of function value, used as heuristic)
+visibility_matrix <- outer(x_vals, y_vals, Vectorize(function(x, y) 1 / (ackley_function(x, y) + 1e-10)))
+```
+
+# Func to choose next position
+```{r}
+# Function to choose next position based on pheromones and heuristic
+choose_next_position <- function(current_x_idx, current_y_idx) {
+  probabilities <- matrix(0, nrow = n_steps, ncol = n_steps)
+  
+  for (i in 1:n_steps) {
+    for (j in 1:n_steps) {
+      probabilities[i, j] <- (pheromone_matrix[i, j]^alpha) * (visibility_matrix[i, j]^beta)
+    }
+  }
+  # Once all the probabilities are computed, they are normalized by dividing each element by the sum of all probabilities. 
+  # This ensures that the probabilities sum to 1, which is necessary for the next step (random selection).
+  probabilities <- probabilities / sum(probabilities)
+  
+  # The matrix probabilities is flattened into a single vector flat_probabilities, because the sample() function used 
+  # later requires a 1D array for selecting a position.
+  flat_probabilities <- as.vector(probabilities)
+  
+  # The sample() function is used to randomly select the next position from the set of all possible positions on the grid, 
+  # with the probability of each position given by flat_probabilities. 
+  # The parameter size = 1 means that only one position is chosen.
+  chosen_index <- sample(1:(n_steps^2), size = 1, prob = flat_probabilities)
+  
+  # The chosen_index from the flat vector is converted back into grid coordinates (chosen_x_idx, chosen_y_idx).
+  # This is done using modular arithmetic:
+  # - %% n_steps gives the column index (x).
+  # - %/% n_steps gives the row index (y).
+  chosen_x_idx <- ((chosen_index - 1) %% n_steps) + 1
+  chosen_y_idx <- ((chosen_index - 1) %/% n_steps) + 1
+  
+  return(c(chosen_x_idx, chosen_y_idx))
+}
+```
+
+```{r}
+# Main ACO loop
+best_solution <- NULL
+best_value <- Inf
+
+for (iter in 1:n_iterations) {
+  ant_solutions <- list()
+  ant_values <- numeric(n_ants)
+  
+  for (ant in 1:n_ants) {
+    # Each ant starts at a random position
+    current_x_idx <- sample(1:n_steps, 1)
+    current_y_idx <- sample(1:n_steps, 1)
+    
+    current_x <- x_vals[current_x_idx]
+    current_y <- y_vals[current_y_idx]
+    
+    for (step in 1:ant_steps) {  # Limit the number of steps each ant can take
+      new_position <- choose_next_position(current_x_idx, current_y_idx)
+      current_x_idx <- new_position[1]
+      current_y_idx <- new_position[2]
+      
+      current_x <- x_vals[current_x_idx]
+      current_y <- y_vals[current_y_idx]
+    }
+    
+    # Evaluate the solution
+    solution_value <- ackley_function(current_x, current_y)
+    ant_solutions[[ant]] <- c(current_x, current_y)
+    ant_values[ant] <- solution_value
+    
+    # Update best solution found so far
+    if (solution_value < best_value) {
+      best_solution <- c(current_x, current_y)
+      best_value <- solution_value
+    }
+  }
+  
+  # Update pheromones
+  pheromone_matrix <- (1 - decay) * pheromone_matrix
+  
+  for (ant in 1:n_ants) {
+    solution <- ant_solutions[[ant]]
+    solution_x_idx <- which.min(abs(x_vals - solution[1]))
+    solution_y_idx <- which.min(abs(y_vals - solution[2]))
+    
+    pheromone_matrix[solution_x_idx, solution_y_idx] <- pheromone_matrix[solution_x_idx, solution_y_idx] + Q / ant_values[ant]
+  }
+  
+  # Print progress
+  cat("Iteration:", iter, "- Best value so far:", best_value, "\n")
+}
+
+```
+
+```{r}
+# Print final results
+cat("Best solution found:", best_solution, "\n")
+cat("Best Ackley function value:", best_value, "\n")
+```
+
+
+
+
+
+
+
