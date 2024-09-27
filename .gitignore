@@ -2,5 +2,5 @@
 __pycache__/
 *.pyc
 
-# Ignore CSV files
-*.csv
+# Ignore parquet files
+*.parquet
