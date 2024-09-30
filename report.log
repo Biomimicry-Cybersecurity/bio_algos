@@ -1,0 +1,35 @@
+2024-09-29 22:18:39,095 - pyswarms.backend.generators - ERROR - generate_swarm() takes an int for n_particles and dimensions and an array for bounds
+Traceback (most recent call last):
+  File "/Applications/anaconda3/lib/python3.8/site-packages/pyswarms/backend/generators.py", line 74, in generate_swarm
+    lb, ub = bounds
+TypeError: cannot unpack non-iterable float object
+2024-09-29 22:28:22,010 - pyswarms.backend.generators - ERROR - generate_swarm() takes an int for n_particles and dimensions and an array for bounds
+Traceback (most recent call last):
+  File "/Applications/anaconda3/lib/python3.8/site-packages/pyswarms/backend/generators.py", line 74, in generate_swarm
+    lb, ub = bounds
+TypeError: cannot unpack non-iterable float object
+2024-09-29 22:33:18,251 - pyswarms.backend.generators - ERROR - generate_swarm() takes an int for n_particles and dimensions and an array for bounds
+Traceback (most recent call last):
+  File "/Applications/anaconda3/lib/python3.8/site-packages/pyswarms/backend/generators.py", line 74, in generate_swarm
+    lb, ub = bounds
+TypeError: cannot unpack non-iterable float object
+2024-09-29 22:33:19,727 - pyswarms.backend.generators - ERROR - generate_swarm() takes an int for n_particles and dimensions and an array for bounds
+Traceback (most recent call last):
+  File "/Applications/anaconda3/lib/python3.8/site-packages/pyswarms/backend/generators.py", line 74, in generate_swarm
+    lb, ub = bounds
+TypeError: cannot unpack non-iterable float object
+2024-09-29 22:36:00,500 - pyswarms.backend.generators - ERROR - generate_swarm() takes an int for n_particles and dimensions and an array for bounds
+Traceback (most recent call last):
+  File "/Applications/anaconda3/lib/python3.8/site-packages/pyswarms/backend/generators.py", line 74, in generate_swarm
+    lb, ub = bounds
+TypeError: cannot unpack non-iterable float object
+2024-09-29 22:36:01,875 - pyswarms.backend.generators - ERROR - generate_swarm() takes an int for n_particles and dimensions and an array for bounds
+Traceback (most recent call last):
+  File "/Applications/anaconda3/lib/python3.8/site-packages/pyswarms/backend/generators.py", line 74, in generate_swarm
+    lb, ub = bounds
+TypeError: cannot unpack non-iterable float object
+2024-09-29 22:36:57,901 - pyswarms.backend.generators - ERROR - generate_swarm() takes an int for n_particles and dimensions and an array for bounds
+Traceback (most recent call last):
+  File "/Applications/anaconda3/lib/python3.8/site-packages/pyswarms/backend/generators.py", line 74, in generate_swarm
+    lb, ub = bounds
+TypeError: cannot unpack non-iterable float object
