@@ -4,3 +4,9 @@ __pycache__/
 
 # Ignore parquet files
 *.parquet
+
+# ignore Mac system files
+.DS_Store
+
+# ignore data folder
+/data/
